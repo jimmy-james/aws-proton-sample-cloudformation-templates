@@ -7,39 +7,139 @@ schema:
   types:
     LoadBalancedServiceInput:
       type: object
-      description: "Input properties for a loadbalanced Fargate service"
+      description: ECS container input properties
       properties:
-        port:
-          title: "Port"
-          type: number
-          description: "The port to route traffic to"
-          default: 80
-          minimum: 0
-          maximum: 65535
-        health_check_path:
-          title: Health Check Path
-          description: The health check path
+        appName:
+          default: demo-app
           type: string
-          default: /
-        desired_count:
-          title: "Desired count"
-          type: number
-          description: "The default number of Fargate tasks you want running"
-          default: 1
-          minimum: 1
-        task_size:
-          title: "Task size"
-          type: string
-          description: "The size of the task you want to run"
-          enum: ["x-small", "small", "medium", "large", "x-large"]
-          default: "x-small"
-        image:
-          title: "Image"
-          type: string
-          description: "The name/url of the container image"
-          default: "public.ecr.aws/nginx/nginx:1.21"
-          minLength: 1
-          maxLength: 200
+        tasks:
+          items:
+            default: []
+            properties:
+              alb:
+                properties:
+                  basePath:
+                    default: ''
+                    description: Unique routing path to be used by ALB's target group
+                    maxLength: 20
+                    minLength: 0
+                    type: string
+                  containerName:
+                    default: main
+                    description: The name of the container (as it appears in a container
+                      definition) to associate with the load balancer.
+                    type: string
+                  healthCheckPath:
+                    default: /
+                    maxLength: 20
+                    minLength: 0
+                    type: string
+                  listener_rule_priority:
+                    default: 1
+                    description: The LoadBalancer rule priority. A listener can't
+                      have multiple rules with the same priority.
+                    maximum: 50000
+                    minimum: 1
+                    type: number
+                  port:
+                    default: 443
+                    description: ''
+                    maximum: 65535
+                    minimum: 0
+                    type: integer
+                  protocol:
+                    default: HTTP
+                    enum:
+                    - HTTP
+                    - HTTPS
+                    type: string
+                type: object
+              containers:
+                default: []
+                items:
+                  properties:
+                    containerPort:
+                      default: 443
+                      description: For task definitions that use the awsvpc network
+                        mode, you should only specify the containerPort
+                      maximum: 65535
+                      minimum: 0
+                      type: integer
+                    environment:
+                      default: []
+                      description: The environment variables to pass to a container.
+                      items:
+                        properties:
+                          name:
+                            type: string
+                          value:
+                            type: string
+                        type: object
+                      type: array
+                    image:
+                      default: public.ecr.aws/nginx/nginx:latest
+                      description: The image used to start a container. This string
+                        is passed directly to the Docker daemon.
+                      type: string
+                    name:
+                      default: main
+                      description: The name of a container. If you're linking multiple
+                        containers together in a task definition, the name of one
+                        container can be entered in the links of another container
+                        to connect the containers. Up to 255 letters (uppercase and
+                        lowercase), numbers, underscores, and hyphens are allowed.
+                      maxLength: 255
+                      minLength: 1
+                      type: string
+                  type: object
+                type: array
+              cpu:
+                default: '1024'
+                description: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ecs-taskdefinition.html#cfn-ecs-taskdefinition-cpu
+                enum:
+                - '1024'
+                - '2048'
+                - '4096'
+                type: string
+              ephemeralStorageSizeInGiB:
+                default: 21
+                description: The total amount, in GiB, of ephemeral storage to set
+                  for the task. The minimum supported value is 21 GiB and the maximum
+                  supported value is 200 GiB.
+                maximum: 200
+                minimum: 21
+                type: integer
+              executionRolePolicy:
+                items:
+                  properties:
+                    action:
+                      items:
+                        type: string
+                      type: array
+                    effect:
+                      enum:
+                      - Allow
+                      - Deny
+                      type: string
+                    resource:
+                      items:
+                        type: string
+                      type: array
+                  type: object
+                type: array
+              memory:
+                default: '2048'
+                description: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ecs-taskdefinition.html#cfn-ecs-taskdefinition-cpu
+                type: string
+              serviceInstanceCount:
+                default: 1
+                description: The number of instantiations of the specified task definition
+                  to place and keep running on your cluster.
+                maximum: 12
+                minimum: 1
+                type: integer
+            type: object
+          type: array
 
     PipelineInputs:
       type: object
