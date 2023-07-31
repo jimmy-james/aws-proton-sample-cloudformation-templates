@@ -1,0 +1,2 @@
+compatible_environments:
+  - fargate-env:1
