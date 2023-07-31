@@ -7,7 +7,7 @@ schema:
   types:
     LoadBalancedFargateServiceInput:
       type: object
-      description: "Input properties for a loadbalanced Fargate service"
+      description: "Input properties for a loadbalanced Fargate service (TEST_COMMIT)"
       properties:
         port:
           title: "Port"
